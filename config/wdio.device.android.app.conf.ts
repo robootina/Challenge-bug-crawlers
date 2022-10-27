@@ -31,6 +31,8 @@ config.capabilities = [
         "appium:appPackage": "com.zemoga.fsbp",
         "appium:appWaitActivity": "com.holcimbe.technical.MainActivity",
         "appium:newCommandTimeout": 240,
+        //"appium:autoAcceptAlerts": true,
+        "appium:autoGrantPermissions": true,
     },
 ];
 
