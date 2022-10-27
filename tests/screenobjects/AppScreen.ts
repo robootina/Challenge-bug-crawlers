@@ -25,4 +25,11 @@ export default class AppScreen {
             ? `id=${selector}`
             : `//*[@content-desc="${selector}"]`;
     }
+
+    /**
+     * Get element based on content-desc
+     */
+    contentDescContains(selector: string): string {
+        return `//*[contains(@content-desc,'${selector}') or contains(@id,'${selector}')]`;
+    }
 }

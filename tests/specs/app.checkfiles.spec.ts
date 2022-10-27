@@ -1,6 +1,5 @@
 import { getSupportedCodeFixes } from "typescript";
 import StartUp from "../screenobjects/StartupScreen";
-import MainMenu from "../screenobjects/MainMenuScreen";
 import TISMenu from "../screenobjects/TISMenuScreen";
 import FILE_DATA from "../../data/testFiles.json";
 

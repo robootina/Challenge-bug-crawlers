@@ -6,5 +6,30 @@
             "path": "Technical Information Sheets/Insulation/Polyiso Board",
             "pages": 4
         }
+    },
+    "videoPlaylists": {
+        "ACCESSORIES": {
+            "id": "ACCESSORIES\n4 Videos",
+            "title": "ACCESSORIES",
+            "videos": [
+                {
+                    "id": "One-Part Pourable Sealer is approved flashing details",
+                    "time": "01:00",
+                    "description": "One-Part Pourable Sealer can also be used as a liquid flashing when combined with Firestone UltraFlash™ Fabric to create a monolithic membrane. This liquid applied membrane is suitable for roof flashings on TPO, EPDM, APP, SBS and BUR roofs."
+                },
+                {
+                    "id": "Firestone Twin Jet Instructional Video",
+                    "time": "05:05"
+                },
+                {
+                    "id": "Jet Bond Spray Adhesive",
+                    "time": "00:30"
+                },
+                {
+                    "id": "Jet Bond Spray Adhesive Training Video",
+                    "time": "03:18"
+                }
+            ]
+        }
     }
 }
