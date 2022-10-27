@@ -1,105 +1,67 @@
 import { getSupportedCodeFixes } from "typescript";
+import StartUp from "../screenobjects/StartupScreen";
+import MainMenu from "../screenobjects/MainMenuScreen";
+import TISMenu from "../screenobjects/TISMenuScreen";
+import FILE_DATA from "../../data/testFiles.json";
+
+/**
+ * Set test mode to check actual documents vs expected
+ * Record mode to set expected images
+ */
+const TEST_MODE = "actual";
+const RECORD_MODE = "expected";
+const CURRENT_MODE = TEST_MODE;
 
 describe("Navigate to a file", () => {
     beforeEach(async () => {});
 
-    it("should be able to access a document", async () => {
-        await $("~NEXT").waitForDisplayed({
-            timeout: 20000,
-        });
+    it("should be able to access a Technicall Info Sheet document", async () => {
+        const documentDataObj = FILE_DATA.documents.case1;
 
-        await $("~NEXT").click();
-        await $("~Americas").click();
-        await $("~United States").click();
-        await $("~SELECT REGION").click();
+        await StartUp.waitForIsShown();
 
-        await $("~Architect").click();
-        await $("~START USING THE APP").click();
+        await StartUp.navigateToMainScreen();
 
-        await $("~CONTINUE").click();
-        await $("~CONTINUE").click();
-        await $("~CONTINUE").click();
+        await TISMenu.selectByFileData(documentDataObj);
 
-        const firstFeaturePanelLocaltor = locatorStrategy(
-            "FEATURE!\nChange Settings\nYou can change your region by going to the MORE menu and choosing the option that suits your needs.\nFEATURE!\nMy Files\nYou can add documents and review them in the My Files section.\nFEATURE!\nMore menu\nHere you can find some useful content such as Find a Contractor/Sales Rep.\nFEATURE!\nLog In\nLog in and discover more features related to your role.\nDONE"
-        );
-        await $(firstFeaturePanelLocaltor).click();
+        let screenshotPath = `./screenshots/${CURRENT_MODE}/`;
 
-        const screenSize = await driver.getWindowSize();
-        const elementLocation = await (
-            await $(firstFeaturePanelLocaltor)
-        ).getLocation();
-        const elementSize = await (
-            await $(firstFeaturePanelLocaltor)
-        ).getSize();
+        let screenshots = [];
+        for (let page = 1; page <= documentDataObj.pages; page++) {
+            let screenshot = screenshotPath + `pdf${page}.png`;
+            await driver.saveScreenshot(screenshot);
+            screenshots.push(screenshot);
+            if (page > 1) await magic(page);
+        }
 
-        console.log(elementLocation); // outputs: { x: 0, y: 864 }
-        console.log(elementSize); // outputs: { width: 1080, height: 1322 }
-        console.log(screenSize); // outputs: { width: 1080, height: 2186 }
+        console.log("Screenshots taken!", screenshots);
 
-        const xPercentage = (925 * 100) / 1080;
-        const yPercentage = (2160 * 100) / 2186;
-
-        const { width, height } = await driver.getWindowSize();
-        const x = (width * xPercentage) / 100;
-        const y = (height * yPercentage) / 100;
-
-        await driver.touchAction({
-            action: "tap",
-            x,
-            y,
-        });
-
-        const secondFeaturePanelLocator = locatorStrategy(
-            "NEW!\nSearch by voice!\nLook for the document needed just saying a keyword!\nDONE"
-        );
-        await $(secondFeaturePanelLocator).waitForDisplayed({
-            timeout: 20000,
-        });
-
-        await driver.touchAction({
-            action: "tap",
-            x,
-            y,
-        });
-
-        await $("~Technical Information Sheets").click();
-        await $("~Insulation").click();
-        await $("~Polyiso Board").click();
-        await $(
-            "~APR\n2022\nTIS 901A - ISO 95+ GL\nProduct: Insulation, Asphalt, TPO, EPDM, PVC\nType: Technical Information Sheets (TIS)\nLanguage: EN"
-        ).click();
-        await $("~TIS 901A - ISO 95+ GL").waitForDisplayed({
-            timeout: 20000,
-        });
-        //TODO remove pause and find an element to wait for
-        await driver.pause(5000);
-        //TODO get path from a const or config
-        let screenshot = await driver.saveScreenshot("./screenshots/pdf1.png");
-        console.log(screenshot);
-        //TODO include image check module
+        if (CURRENT_MODE === TEST_MODE) {
+            console.log("test....");
+            //TODO include image check module
+        }
     });
 });
 
-function magic(location) {
-    // do a horizontal swipe by percentage
-    const startPercentage = 10;
+async function magic(page: number) {
+    // do a vertical swipe by percentage
+    const startPercentage = 20;
     const endPercentage = 90;
     const anchorPercentage = 50;
 
     const { width, height } = driver.getWindowSize();
-    const anchor = (height * anchorPercentage) / 100;
-    const startPoint = (width * startPercentage) / 100;
-    const endPoint = (width * endPercentage) / 100;
-    driver.touchPerform([
+    const anchor = (width * anchorPercentage) / 100;
+    const startPoint = (height * startPercentage) / 100;
+    const endPoint = (height * endPercentage) / 100;
+    await driver.touchPerform([
         {
             action: "press",
             options: {
-                x: startPoint,
-                y: anchor,
+                x: anchor,
+                y: startPoint,
             },
         },
-        /*{
+        {
             action: "wait",
             options: {
                 ms: 100,
@@ -108,17 +70,14 @@ function magic(location) {
         {
             action: "moveTo",
             options: {
-                x: endPoint,
-                y: anchor,
+                x: anchor,
+                y: endPoint,
             },
-        },*/
+        },
         {
             action: "release",
             options: {},
         },
     ]);
+    //await driver.saveScreenshot(`./screenshots/pdf${page}.png`);
 }
-
-const locatorStrategy = (selector: string): string => {
-    return driver.isIOS ? `id=${selector}` : `//*[@content-desc="${selector}"]`;
-};
