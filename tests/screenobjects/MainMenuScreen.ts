@@ -18,6 +18,9 @@ class MainMenu extends AppScreen {
     async selectTechnicalInfoSheets() {
         await this.technicalInfoSheetsButton.click();
     }
+    async openExtraMenu() {
+        await $("~MORE\nTab 3 of 3").click();
+    }
 }
 
 export default new MainMenu();
