@@ -10,6 +10,7 @@
         "android.sauce.rdc.app.us": "wdio config/saucelabs/wdio.android.rdc.app.conf.ts",
         "android.app": "wdio config/wdio.android.app.conf.ts",
         "device.app": "wdio config/wdio.device.android.app.conf.ts --spec ./tests/specs/app.checkfiles.spec.ts",
+        "ga52.app": "wdio config/wdio.gA52.device.android.app.conf.ts --spec ./tests/specs/app.checkfiles.spec.ts",
         "android.browser": "wdio config/wdio.android.browser.conf.ts",
         "ios.app": "wdio config/wdio.ios.app.conf.ts",
         "ios.sauce.simulators.app.eu": "REGION=eu wdio ./config/saucelabs/wdio.ios.simulators.app.conf.ts",
