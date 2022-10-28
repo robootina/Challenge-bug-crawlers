@@ -90,37 +90,7 @@ export const config: WebdriverIO.Config = {
     // - wdio.shared.local.appium.conf.ts
     // - wdio.shared.sauce.conf.ts
     // configuration files
-    services: [
-        /* [
-            "image-comparison",
-            // The options
-            {
-                // Some options, see the docs for more
-                baselineFolder: join(process.cwd(), "./screenshots/expected"),
-                formatImageName: "{tag}-{logName}-{width}x{height}",
-                screenshotPath: join(process.cwd(), ".tmp/"),
-                savePerInstance: true,
-                autoSaveBaseline: true,
-                blockOutStatusBar: true,
-                blockOutToolBar: true,
-                // NOTE: When you are testing a hybrid app please use this setting
-                isHybridApp: true,
-                // Options for the tabbing image
-                tabbableOptions: {
-                    circle: {
-                        size: 18,
-                        fontSize: 18,
-                        // ...
-                    },
-                    line: {
-                        color: "#ff221a", // hex-code or for example words like `red|black|green`
-                        width: 3,
-                    },
-                },
-                // ... more options
-            },
-        ],*/
-    ],
+    services: [],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks

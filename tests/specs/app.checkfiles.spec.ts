@@ -19,7 +19,6 @@ describe("Navigate to a file", () => {
         const TEST_MODE = "actual";
         const RECORD_MODE = "expected";
         let CURRENT_MODE = TEST_MODE;
-        let INIT_MODE = CURRENT_MODE;
         const caseName = "case1";
         const deviceName = "testDevice"; //TODO get this from config
         const documentDataObj = FILE_DATA.documents[caseName];
