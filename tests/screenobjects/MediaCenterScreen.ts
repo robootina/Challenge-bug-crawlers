@@ -2,15 +2,12 @@ import AppScreen from "./AppScreen";
 
 class MediaCenter extends AppScreen {
     constructor() {
-        super("~Technical Information Sheets");
+        super("");
     }
 
     /**
      * define elements
      */
-    get technicalInfoSheetsButton() {
-        return $("~Technical Information Sheets");
-    }
 
     /**
      * define methods
@@ -25,10 +22,11 @@ class MediaCenter extends AppScreen {
         });
         await $(`~${playlistID}`).click();
     }
+
     /**
      * Open video based on its data
      */
-    async openVideo(videoDataFile: any) {
+    async openVideo(videoDataFile: any, play = true) {
         const videoTitleElem = await $(
             this.contentDescContains(videoDataFile.id)
         );
@@ -36,8 +34,12 @@ class MediaCenter extends AppScreen {
         await videoTitleElem.waitForDisplayed({
             timeout: 20000,
         });
-        videoTitleElem.parent.touchClick();
+        videoTitleElem.click();
+        if (play) {
+            this.playVideo(videoDataFile);
+        }
     }
+
     /**
      * Play video based on its data
      */

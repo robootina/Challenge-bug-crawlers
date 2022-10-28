@@ -18,3 +18,4 @@ chromeDriver
 .tmp
 screenshots/actual/
 .tsbuild/
+reports/*
