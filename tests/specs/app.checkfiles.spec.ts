@@ -28,9 +28,10 @@ describe("Navigate to a file", () => {
         let screenshots = [];
         for (let page = 1; page <= documentDataObj.pages; page++) {
             let screenshot = screenshotPath + `pdf${page}.png`;
-            await driver.saveScreenshot(screenshot);
             screenshots.push(screenshot);
-            if (page > 1) await magic(page);
+            if (page > 1) await magic();
+            const elem = await $('/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[2]/android.view.View/android.view.View/android.widget.ImageView');
+            await elem.saveScreenshot(screenshot);
         }
 
         console.log("Screenshots taken!", screenshots);
@@ -42,16 +43,16 @@ describe("Navigate to a file", () => {
     });
 });
 
-async function magic(page: number) {
+async function magic() {
     // do a vertical swipe by percentage
     const startPercentage = 20;
     const endPercentage = 90;
     const anchorPercentage = 50;
 
-    const { width, height } = driver.getWindowSize();
+    const { width, height } =  await driver.getWindowSize();
     const anchor = (width * anchorPercentage) / 100;
-    const startPoint = (height * startPercentage) / 100;
-    const endPoint = (height * endPercentage) / 100;
+    const endPoint = (height * startPercentage) / 100;
+    const startPoint = (height * endPercentage) / 100;
     await driver.touchPerform([
         {
             action: "press",
@@ -63,7 +64,7 @@ async function magic(page: number) {
         {
             action: "wait",
             options: {
-                ms: 100,
+                ms: 1000,
             },
         },
         {
