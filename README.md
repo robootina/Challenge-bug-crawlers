@@ -3,6 +3,7 @@
 ## Try it out!
 
 1. Clone repository
+1. Copy the .apk file to the apps folder
 1. Execute `npm install`
 1. Configure your mobile device by making a copy of `config/wdio.gA52.device.android.app.conf.ts` and changing accordingly.
 1. In package.json add a script to run the test using the config file you created in the last step. You can use the ga52.video and ga52.file scripts as example
