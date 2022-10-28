@@ -1,21 +1,28 @@
-import { getSupportedCodeFixes } from "typescript";
+import { getSupportedCodeFixes, isAssertClause } from "typescript";
 import StartUp from "../screenobjects/StartupScreen";
 import TISMenu from "../screenobjects/TISMenuScreen";
+import DocumentScreen from "../screenobjects/DocumentScreen";
 import FILE_DATA from "../../data/testFiles.json";
+import * as fs from "fs";
 
-/**
- * Set test mode to check actual documents vs expected
- * Record mode to set expected images
- */
-const TEST_MODE = "actual";
-const RECORD_MODE = "expected";
-const CURRENT_MODE = TEST_MODE;
+const PNG = require("pngjs").PNG;
+const pixelmatch = require("pixelmatch");
 
 describe("Navigate to a file", () => {
     beforeEach(async () => {});
 
     it("should be able to access a Technicall Info Sheet document", async () => {
-        const documentDataObj = FILE_DATA.documents.case1;
+        /**
+         * Set test mode to check actual documents vs expected
+         * Record mode to set expected images
+         */
+        const TEST_MODE = "actual";
+        const RECORD_MODE = "expected";
+        let CURRENT_MODE = TEST_MODE;
+        let INIT_MODE = CURRENT_MODE;
+        const caseName = "case1";
+        const deviceName = "testDevice"; //TODO get this from config
+        const documentDataObj = FILE_DATA.documents[caseName];
 
         await StartUp.waitForIsShown();
 
@@ -23,61 +30,102 @@ describe("Navigate to a file", () => {
 
         await TISMenu.selectByFileData(documentDataObj);
 
-        let screenshotPath = `./screenshots/${CURRENT_MODE}/`;
+        //TODO need to add folder for device
 
-        let screenshots = [];
-        for (let page = 1; page <= documentDataObj.pages; page++) {
-            let screenshot = screenshotPath + `pdf${page}.png`;
-            screenshots.push(screenshot);
-            if (page > 1) await magic();
-            const elem = await $('/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View[2]/android.view.View/android.view.View/android.widget.ImageView');
-            await elem.saveScreenshot(screenshot);
+        let actualScreenshotPath = `./screenshots/${TEST_MODE}/${caseName}/${deviceName}/`;
+        let expectedScreenshotPath = `./screenshots/${RECORD_MODE}/${caseName}/${deviceName}/`;
+
+        let screenshotPath = actualScreenshotPath;
+
+        //expected folder should exist, else we cannot compare images
+        let expectedFolderExists = fs.existsSync(expectedScreenshotPath);
+        if (!expectedFolderExists) {
+            CURRENT_MODE = RECORD_MODE;
+            createDirectoryIfNotExist(expectedScreenshotPath);
+            screenshotPath = expectedScreenshotPath;
+        } else {
+            //create directory where actual images will be stored if not exist
+            createDirectoryIfNotExist(screenshotPath);
         }
 
-        console.log("Screenshots taken!", screenshots);
+        let screenshotsTaken = [];
+        for (let page = 1; page <= documentDataObj.pages; page++) {
+            let filename = `pdf${page}.png`;
+            let screenshotFilePath = screenshotPath + filename;
+            screenshotsTaken.push(filename);
+            if (page > 1) {
+                await DocumentScreen.swipe();
+            }
+
+            await DocumentScreen.takeScreenshot(screenshotFilePath);
+        }
+
+        console.log("Screenshots taken!", screenshotsTaken);
+
+        if (!expectedFolderExists) {
+            console.log(
+                `EXPECTED images for this test were created. Make sure these reflect the expected look. Please re-run test`
+            );
+            expect(expectedFolderExists).toBeTruthy();
+            return;
+        }
 
         if (CURRENT_MODE === TEST_MODE) {
-            console.log("test....");
-            //TODO include image check module
+            //TODO get this from config
+            const reportFolder = `./reports/${caseName}`;
+            let failedImages = [];
+            for (let fileName of screenshotsTaken) {
+                const imgActual = PNG.sync.read(
+                    fs.readFileSync(`${actualScreenshotPath}/${fileName}`)
+                );
+                const imgExpected = PNG.sync.read(
+                    fs.readFileSync(`${expectedScreenshotPath}/${fileName}`)
+                );
+                const { width, height } = imgActual;
+                const diff = new PNG({ width, height });
+
+                let pixelNumber = pixelmatch(
+                    imgActual.data,
+                    imgExpected.data,
+                    diff.data,
+                    width,
+                    height,
+                    {
+                        threshold: 0.1,
+                    }
+                );
+
+                if (pixelNumber > 0) {
+                    //pixelNumber is higher than zero hence there is a difference
+                    createDirectoryIfNotExist(reportFolder);
+                    fs.writeFileSync(
+                        `${reportFolder}/diff${fileName}`,
+                        PNG.sync.write(diff)
+                    );
+                    //TODO convert this to object so each image has a failure %
+                    failedImages.push(fileName);
+                }
+            }
+            let numFailedPages = failedImages.length;
+            if (numFailedPages > 0) {
+                console.log(
+                    `
+                    
+                    =================================
+                    Document ${documentDataObj.title} has differences on ${numFailedPages} pages!!
+                    Please check ${reportFolder} to see the differences.
+                    =================================
+                    
+                    `
+                );
+            }
+            expect(numFailedPages).toEqual(0);
         }
     });
 });
 
-async function magic() {
-    // do a vertical swipe by percentage
-    const startPercentage = 20;
-    const endPercentage = 90;
-    const anchorPercentage = 50;
-
-    const { width, height } =  await driver.getWindowSize();
-    const anchor = (width * anchorPercentage) / 100;
-    const endPoint = (height * startPercentage) / 100;
-    const startPoint = (height * endPercentage) / 100;
-    await driver.touchPerform([
-        {
-            action: "press",
-            options: {
-                x: anchor,
-                y: startPoint,
-            },
-        },
-        {
-            action: "wait",
-            options: {
-                ms: 1000,
-            },
-        },
-        {
-            action: "moveTo",
-            options: {
-                x: anchor,
-                y: endPoint,
-            },
-        },
-        {
-            action: "release",
-            options: {},
-        },
-    ]);
-    //await driver.saveScreenshot(`./screenshots/pdf${page}.png`);
+function createDirectoryIfNotExist(path) {
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path, { recursive: true });
+    }
 }
