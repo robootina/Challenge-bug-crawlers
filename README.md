@@ -10,6 +10,8 @@
     1. Execute `npm run ga52.file` to execute the test to verify a document
     1. Execute `npm run ga52.video` to execute the test to verify a video
 
+The test: `tests/specs/app.checkfiles.spec.ts` will fail for page 1 as the expected image was modified on purpose so show the test failes and to show the generated file shows the difference between the actual state of the file vs. the expected one. (see the reports folder)
+
 ## Demo and Presentation
 
 Please visit this [Google Drive folder](https://drive.google.com/drive/folders/1kg0q3PysL25ocCfbvO84bp_5ZDrkpDIv?usp=share_link)
